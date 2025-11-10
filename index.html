@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EarnApp Admin / Demo</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa6b2;--accent:#06b6d4;--ok:#10b981}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#071024 0%, #081428 100%);color:#e6eef6;margin:0;padding:24px}
+    .container{max-width:980px;margin:0 auto}
+    h1{font-size:20px;margin:0 0 14px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+    .card{background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;box-shadow:0 6px 18px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input,textarea,select,button{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:transparent;color:inherit;font-size:14px}
+    button{cursor:pointer;background:linear-gradient(90deg,var(--accent),#7dd3fc);color:#001219;font-weight:600}
+    .muted{color:var(--muted);font-size:13px}
+    pre{background:rgba(0,0,0,0.2);padding:8px;border-radius:6px;overflow:auto;font-size:13px}
+    .row{display:flex;gap:8px}
+    .row > *{flex:1}
+    .small{padding:8px;font-size:13px}
+    .result{margin-top:10px;font-size:13px}
+    .ok{color:var(--ok)}
+    .danger{color:#fb7185}
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+    @media (max-width:520px){body{padding:12px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>EarnApp — Frontend Demo (API test UI)</h1>
+    <p class="muted">Use this page to test all server endpoints. Deploy this file to project root (https://your-project.vercel.app/index.html)</p>
+
+    <div class="grid">
+      <!-- Health -->
+      <div class="card">
+        <strong>Health Check</strong>
+        <p class="muted">Check API & DB connection</p>
+        <button id="btnHealth">Check Health</button>
+        <div id="healthResult" class="result"></div>
+      </div>
+
+      <!-- Register -->
+      <div class="card">
+        <strong>Register User</strong>
+        <p class="muted">Create new user</p>
+        <label>userId (unique)</label>
+        <input id="reg_userId" placeholder="e.g. u123" />
+        <label>Full name</label>
+        <input id="reg_fullName" placeholder="Raja Kumar" />
+        <label>Phone (optional)</label>
+        <input id="reg_phone" placeholder="+91..." />
+        <label>Referral code (optional)</label>
+        <input id="reg_ref" placeholder="REFCODE" />
+        <div style="height:8px"></div>
+        <button id="btnRegister">Register</button>
+        <div id="regResult" class="result"></div>
+      </div>
+
+      <!-- Get / Update User -->
+      <div class="card">
+        <strong>Get / Update User</strong>
+        <p class="muted">Fetch or update user data</p>
+        <label>userId</label>
+        <input id="get_userId" placeholder="u123" />
+        <div class="row" style="margin-top:6px">
+          <button id="btnGetUser" class="small">GET</button>
+          <button id="btnUpdateUser" class="small">PUT (update sample)</button>
+        </div>
+        <div id="getUserResult" class="result"></div>
+      </div>
+
+      <!-- Tasks -->
+      <div class="card">
+        <strong>Tasks</strong>
+        <p class="muted">List tasks</p>
+        <button id="btnTasks">Load Tasks</button>
+        <div id="tasksResult" class="result"></div>
+      </div>
+
+      <!-- Complete Task -->
+      <div class="card">
+        <strong>Complete Task</strong>
+        <p class="muted">Mark a task complete for a user</p>
+        <label>userId</label><input id="ct_userId" placeholder="u123" />
+        <label>taskId</label><input id="ct_taskId" placeholder="task1" />
+        <label>taskName</label><input id="ct_taskName" placeholder="Download App A" />
+        <label>reward (number)</label><input id="ct_reward" placeholder="50" />
+        <div style="height:8px"></div>
+        <button id="btnCompleteTask">Complete Task</button>
+        <div id="completeTaskResult" class="result"></div>
+      </div>
+
+      <!-- Earnings -->
+      <div class="card">
+        <strong>Earnings</strong>
+        <p class="muted">View & Add earnings for a user</p>
+        <label>userId</label><input id="earn_userId" placeholder="u123" />
+        <div class="row" style="margin-top:6px">
+          <button id="btnGetEarnings" class="small">GET</button>
+          <button id="btnAddEarning" class="small">POST (add)</button>
+        </div>
+        <label style="margin-top:8px">Earning type</label><input id="earn_type" placeholder="task / whatsapp" />
+        <label>Amount</label><input id="earn_amount" placeholder="50" />
+        <div id="earnResult" class="result"></div>
+      </div>
+
+      <!-- Referrals -->
+      <div class="card">
+        <strong>Referrals</strong>
+        <p class="muted">View user's referrals or apply a referral code</p>
+        <label>userId (to view referrals)</label><input id="ref_view_userId" placeholder="u123" />
+        <div class="row" style="margin-top:6px">
+          <button id="btnViewRefs" class="small">View</button>
+        </div>
+        <hr style="opacity:0.06;margin:8px 0" />
+        <label>Referral code</label><input id="use_ref_code" placeholder="REF123" />
+        <label>New userId (to apply)</label><input id="use_ref_newUser" placeholder="u124" />
+        <div style="height:8px"></div>
+        <button id="btnUseRef">Apply Referral</button>
+        <div id="refResult" class="result"></div>
+      </div>
+
+      <!-- Admin: Process WhatsApp -->
+      <div class="card">
+        <strong>Process WhatsApp Earnings (Admin)</strong>
+        <p class="muted">Runs the batch to credit connected users</p>
+        <button id="btnProcessWhatsapp">Run Process</button>
+        <div id="processResult" class="result"></div>
+      </div>
+    </div>
+
+    <footer>Tip: Open browser console (F12) to see raw responses. Use these UI forms to test & integrate.</footer>
+  </div>
+
+  <script>
+    // Base: relative so works on same domain
+    const base = '';
+
+    // helper
+    async function request(path, opts = {}) {
+      const url = base + path;
+      try {
+        const res = await fetch(url, {
+          headers: { 'Content-Type': 'application/json' },
+          ...opts
+        });
+        const text = await res.text();
+        try { return { ok: res.ok, status: res.status, data: JSON.parse(text) }; }
+        catch(_) { return { ok: res.ok, status: res.status, data: text }; }
+      } catch (err) {
+        return { ok: false, status: 0, error: err.message };
+      }
+    }
+
+    // Health
+    document.getElementById('btnHealth').onclick = async () => {
+      const out = document.getElementById('healthResult');
+      out.textContent = 'Checking...';
+      const r = await request('/api/health');
+      out.innerHTML = r.ok ? `<span class="ok">OK</span> ${escapeHtml(JSON.stringify(r.data))}` : `<span class="danger">ERR</span> ${escapeHtml(r.error || JSON.stringify(r.data))}`;
+      console.log('health', r);
+    };
+
+    // Register
+    document.getElementById('btnRegister').onclick = async () => {
+      const userId = document.getElementById('reg_userId').value.trim();
+      const fullName = document.getElementById('reg_fullName').value.trim();
+      const phone = document.getElementById('reg_phone').value.trim();
+      const referralCode = document.getElementById('reg_ref').value.trim();
+      const out = document.getElementById('regResult');
+      out.textContent = 'Creating...';
+      const r = await request('/api/user/register', {
+        method: 'POST',
+        body: JSON.stringify({ userId, fullName, phone, referralCode })
+      });
+      out.innerHTML = r.ok ? `<span class="ok">Created</span> ${escapeHtml(JSON.stringify(r.data))}` : `<span class="danger">ERR</span> ${escapeHtml(r.error || JSON.stringify(r.data))}`;
+      console.log('register', r);
+    };
+
+    // Get / Update user
+    document.getElementById('btnGetUser').onclick = async () => {
+      const uid = document.getElementById('get_userId').value.trim();
+      const out = document.getElementById('getUserResult');
+      out.textContent = 'Loading...';
+      const r = await request(`/api/user/${encodeURIComponent(uid)}`);
+      out.innerHTML = r.ok ? `<pre>${escapeHtml(JSON.stringify(r.data, null, 2))}</pre>` : `<span class="danger">ERR</span> ${escapeHtml(r.error || JSON.stringify(r.data))}`;
+      console.log('getUser', r);
+    };
+
+    document.getElementById('btnUpdateUser').onclick = async () => {
+      const uid = document.getElementById('get_userId').value.trim();
+      const out = document.getElementById('getUserResult');
+      out.textContent = 'Updating...';
+      // demo update: add demoUpdatedAt timestamp
+      const r = await request(`/api/user/${encodeURIComponent(uid)}`, {
+        method: 'PUT',
+        body: JSON.stringify({ demoUpdatedAt: new Date().toISOString() })
+      });
+      out.innerHTML = r.ok ? `<span class="ok">Updated</span> <pre>${escapeHtml(JSON.stringify(r.data, null, 2))}</pre>` : `<span class="danger">ERR</span> ${escapeHtml(r.error || JSON.stringify(r.data))}`;
+      console.log('updateUser', r);
+    };
+
+    // Tasks
+    document.getElementById('btnTasks').onclick = async () => {
+      const out = document.getElementById('tasksResult');
+      out.textContent = 'Loading...';
+      const r = await request('/api/tasks');
+      out.innerHTML = r.ok ? `<pre>${escapeHtml(JSON.stringify(r.data, null, 2))}</pre>` : `<span class="danger">ERR</span> ${escapeHtml(r.error || JSON.stringify(r.data))}`;
+      console.log('tasks', r);
+    };
+
+    // Complete Task
+    document.getElementById('btnCompleteTask').onclick = async () => {
+      const userId = document.getElementById('ct_userId').value.trim();
+      const taskId = document.getElementById('ct_taskId').value.trim();
+      const taskName = document.getElementById('ct_taskName').value.trim();
+      const reward = Number(document.getElementById('ct_reward').value || 0);
+      const out = document.getElementById('completeTaskResult');
+      out.textContent = 'Processing...';
+      const r = await request('/api/complete-task', {
+        method: 'POST',
+        body: JSON.stringify({ userId, taskId, taskName, reward })
+      });
+      out.innerHTML = r.ok ? `<span class="ok">Done</span> ${escapeHtml(JSON.stringify(r.data))}` : `<span class="danger">ERR</span> ${escapeHtml(r.error || JSON.stringify(r.data))}`;
+      console.log('completeTask', r);
+    };
+
+    // Earnings get / post
+    document.getElementById('btnGetEarnings').onclick = async () => {
+      const uid = document.getElementById('earn_userId').value.trim();
+      const out = document.getElementById('earnResult');
+      out.textContent = 'Loading...';
+      const r = await request(`/api/earnings/${encodeURIComponent(uid)}`);
+      out.innerHTML = r.ok ? `<pre>${escapeHtml(JSON.stringify(r.data, null, 2))}</pre>` : `<span class="danger">ERR</span> ${escapeHtml(r.error || JSON.stringify(r.data))}`;
+      console.log('getEarnings', r);
+    };
+
+    document.getElementById('btnAddEarning').onclick = async () => {
+      const uid = document.getElementById('earn_userId').value.trim();
+      const type = document.getElementById('earn_type').value.trim();
+      const amount = Number(document.getElementById('earn_amount').value || 0);
+      const out = document.getElementById('earnResult');
+      out.textContent = 'Adding...';
+      const r = await request(`/api/earnings/${encodeURIComponent(uid)}`, {
+        method: 'POST',
+        body: JSON.stringify({ type, amount })
+      });
+      out.innerHTML = r.ok ? `<span class="ok">Added</span> ${escapeHtml(JSON.stringify(r.data))}` : `<span class="danger">ERR</span> ${escapeHtml(r.error || JSON.stringify(r.data))}`;
+      console.log('addEarning', r);
+    };
+
+    // Referrals view
+    document.getElementById('btnViewRefs').onclick = async () => {
+      const uid = document.getElementById('ref_view_userId').value.trim();
+      const out = document.getElementById('refResult');
+      out.textContent = 'Loading...';
+      const r = await request(`/api/referrals/${encodeURIComponent(uid)}`);
+      out.innerHTML = r.ok ? `<pre>${escapeHtml(JSON.stringify(r.data, null, 2))}</pre>` : `<span class="danger">ERR</span> ${escapeHtml(r.error || JSON.stringify(r.data))}`;
+      console.log('viewRefs', r);
+    };
+
+    // Use referral
+    document.getElementById('btnUseRef').onclick = async () => {
+      const code = document.getElementById('use_ref_code').value.trim();
+      const newUser = document.getElementById('use_ref_newUser').value.trim();
+      const out = document.getElementById('refResult');
+      out.textContent = 'Applying...';
+      const r = await request('/api/use-referral', {
+        method: 'POST',
+        body: JSON.stringify({ referralCode: code, newUserId: newUser })
+      });
+      out.innerHTML = r.ok ? `<span class="ok">Applied</span> ${escapeHtml(JSON.stringify(r.data))}` : `<span class="danger">ERR</span> ${escapeHtml(r.error || JSON.stringify(r.data))}`;
+      console.log('useReferral', r);
+    };
+
+    // Process WhatsApp (admin)
+    document.getElementById('btnProcessWhatsapp').onclick = async () => {
+      const out = document.getElementById('processResult');
+      out.textContent = 'Running...';
+      const r = await request('/api/process-whatsapp', { method: 'POST', body: JSON.stringify({}) });
+      out.innerHTML = r.ok ? `<span class="ok">Success</span> ${escapeHtml(JSON.stringify(r.data))}` : `<span class="danger">ERR</span> ${escapeHtml(r.error || JSON.stringify(r.data))}`;
+      console.log('processWhatsapp', r);
+    };
+
+    // small helper to escape HTML for display
+    function escapeHtml(s) {
+      if (typeof s !== 'string') s = JSON.stringify(s);
+      return s.replace(/[&<>"'`=\/]/g, function (c) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','=':'&#x3D;','`':'&#x60;'}[c];
+      });
+    }
+  </script>
+</body>
+</html>
